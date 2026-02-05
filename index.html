@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School-Based Distribution of ITNs - Sierra Leone</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <!-- MAIN CONTENT -->
+    <div class="main-content show" id="mainContent">
+        <div class="page-container">
+            <!-- HEADER -->
+            <div class="page-header">
+                <img src="https://github.com/mohamedsillahkanu/gdp-dashboard-2/raw/6c7463b0d5c3be150aafae695a4bcbbd8aeb1499/ICF-SL.jpg" alt="ICF-SL Logo">
+                <h3>Informatics Consultancy Firm-Sierra Leone<br>(ICF-SL)</h3>
+                <p class="tagline"><em>Driving Data-Driven Solutions for Health and Development</em></p>
+                <h1>SCHOOL-BASED DISTRIBUTION OF ITNs</h1>
+                <p class="subtitle">Insecticide-Treated Nets Distribution Survey - Sierra Leone</p>
+            </div>
+
+            <!-- CONTROLS -->
+            <div class="controls-bar">
+                <button class="control-btn" id="viewDataBtn">📊 VIEW DATA</button>
+                <button class="control-btn" id="viewAnalysisBtn">📈 VIEW ANALYSIS</button>
+                <button class="control-btn draft-btn" id="viewDraftsBtn">📝 VIEW DRAFTS</button>
+            </div>
+
+            <!-- STATUS BAR -->
+            <div class="status-bar">
+                <div class="status-item">
+                    <div class="status-indicator" id="statusIndicator"></div>
+                    <span class="status-text" id="statusText">CHECKING...</span>
+                </div>
+                <div class="status-item">
+                    <span style="color: #000000; font-size: 12px;">DRAFTS:</span>
+                    <span class="draft-count" id="draftCount">0</span>
+                </div>
+                <div class="status-item">
+                    <span style="color: #000000; font-size: 12px;">PENDING:</span>
+                    <span class="pending-count" id="pendingCount">0</span>
+                </div>
+            </div>
+
+            <!-- FORM CARD -->
+            <div class="form-card">
+                <div class="form-content">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                    </div>
+                    <div class="progress-text" id="progressText">SECTION 1 OF 6 <span id="formStatusBadge"></span></div>
+
+                    <form id="dataForm">
+                        <input type="hidden" name="form_status" id="form_status" value="draft">
+                        <input type="hidden" name="draft_id" id="draft_id" value="">
+                        <div id="dynamicSections"></div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- FOOTER -->
+            <div class="page-footer">
+                <p style="margin: 0;">School-Based Distribution of Insecticide-Treated Nets (ITNs)</p>
+                <p>Informatics Consultancy Firm-Sierra Leone (ICF-SL)</p>
+                <p style="font-size: 11px;">Freetown, Sierra Leone</p>
+                <p style="font-size: 10px;">© 2025 Informatics Consultancy Firm-Sierra Leone (ICF-SL)</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- DRAFTS MODAL -->
+    <div class="modal-overlay" id="draftsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">📝 SAVED DRAFTS</span>
+                <button class="modal-close" onclick="closeDraftsModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="draftsModalBody"></div>
+        </div>
+    </div>
+
+    <!-- DRAFT NAME MODAL -->
+    <div class="draft-name-modal" id="draftNameModal">
+        <div class="draft-name-content">
+            <div class="draft-name-header">
+                <h3 class="draft-name-title">💾 SAVE DRAFT</h3>
+            </div>
+            <div class="draft-name-body">
+                <label class="draft-name-label">ENTER A NAME FOR THIS DRAFT:</label>
+                <input type="text" class="draft-name-input" id="draftNameInput" placeholder="e.g., St. Joseph Primary - Bo District">
+                <div class="draft-name-buttons">
+                    <button class="draft-name-btn cancel" onclick="cancelDraftName()">CANCEL</button>
+                    <button class="draft-name-btn save" onclick="confirmSaveDraft()">SAVE DRAFT</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ANALYSIS DASHBOARD MODAL -->
+    <div class="analysis-modal" id="analysisModal">
+        <div class="analysis-content">
+            <div class="analysis-header">
+                <span class="analysis-title">📈 ITN DISTRIBUTION ANALYSIS DASHBOARD</span>
+                <button class="analysis-close" onclick="closeAnalysisModal()">&times;</button>
+            </div>
+            <div class="analysis-body" id="analysisBody">
+                <div class="analysis-loading">
+                    <p>Loading analysis data...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOTIFICATION -->
+    <div class="notification" id="notification">
+        <span class="notification-text" id="notificationText"></span>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
