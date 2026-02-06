@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>School-Based Distribution of ITNs (SBD)- Sierra Leone</title>
+    <title>School-Based ITN Distribution Survey - Sierra Leone</title>
     
     <!-- Favicon - SBD Bold Design (Multiple Sizes) -->
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
@@ -32,7 +32,7 @@
                     <img src="https://github.com/mohamedsillahkanu/gdp-dashboard-2/raw/6c7463b0d5c3be150aafae695a4bcbbd8aeb1499/ICF-SL.jpg" alt="ICF-SL Logo" class="header-logo-main">
                 </div>
                 <h3>Informatics Consultancy Firm-Sierra Leone (ICF-SL)</h3>
-                <p class="tagline"><em>Data-Driven Solutions for Health and Development</em></p>
+                <p class="tagline"><em>Driving Data-Driven Solutions for Health and Development</em></p>
                 <div class="header-divider"></div>
                 <h1>SCHOOL-BASED DISTRIBUTION OF ITNs</h1>
                 <p class="subtitle">Insecticide-Treated Nets Distribution Survey - Sierra Leone</p>
@@ -44,21 +44,27 @@
                 <div class="partners-grid">
                     <div class="partner-logo-card">
                         <div class="partner-logo-img">
-                            <img src="logo_mohs.png" alt="Ministry of Health" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <img src="logo_mohs.png" alt="Ministry of Health" style="display:none;"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                                 onload="this.style.display='block'; this.nextElementSibling.style.display='none';">
                             <div class="logo-placeholder-box">MoHS</div>
                         </div>
                         <span class="partner-name">Ministry of Health</span>
                     </div>
                     <div class="partner-logo-card">
                         <div class="partner-logo-img">
-                            <img src="logo_nmcp.png" alt="NMCP" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <img src="logo_nmcp.png" alt="NMCP" style="display:none;"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                                 onload="this.style.display='block'; this.nextElementSibling.style.display='none';">
                             <div class="logo-placeholder-box">NMCP</div>
                         </div>
                         <span class="partner-name">NMCP</span>
                     </div>
                     <div class="partner-logo-card">
                         <div class="partner-logo-img">
-                            <img src="logo_pmi.png" alt="PMI Evolve" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <img src="logo_pmi.png" alt="PMI Evolve" style="display:none;"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                                 onload="this.style.display='block'; this.nextElementSibling.style.display='none';">
                             <div class="logo-placeholder-box">PMI</div>
                         </div>
                         <span class="partner-name">PMI Evolve</span>
@@ -70,14 +76,17 @@
             <div class="photo-frame-section">
                 <div class="photo-frame">
                     <div class="photo-inner">
-                        <div class="photo-placeholder" id="photoPlaceholder">
+                        <img src="distribution_photo.jpg" alt="ITN Distribution" class="photo-image" id="photoImage" style="display:none;"
+                             onerror="this.style.display='none'; document.getElementById('photoPlaceholder').style.display='flex';"
+                             onload="this.style.display='block'; document.getElementById('photoPlaceholder').style.display='none';">
+                        <div class="photo-placeholder" id="photoPlaceholder" style="display:flex;">
                             <svg class="photo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                                 <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
                                 <circle cx="8.5" cy="8.5" r="1.5"/>
                                 <polyline points="21 15 16 10 5 21"/>
                             </svg>
                             <p class="photo-placeholder-text">DISTRIBUTION PHOTO</p>
-                            <p class="photo-placeholder-hint">Place <strong>infographics.png</strong> here</p>
+                            <p class="photo-placeholder-hint">Place <strong>distribution_photo.jpg</strong> in same folder</p>
                         </div>
                     </div>
                     <div class="photo-caption">
