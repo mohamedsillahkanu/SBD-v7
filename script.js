@@ -320,6 +320,89 @@ function validateAllITNFields() {
 }
 
 // ============================================
+// ITN TYPE QUANTITY VALIDATION
+// ============================================
+function toggleITNTypeQuantity() {
+    const pboChecked = document.getElementById('itn_type_pbo').checked;
+    const ig2Checked = document.getElementById('itn_type_ig2').checked;
+    const quantityFields = document.getElementById('itn_quantity_fields');
+    const pboGroup = document.getElementById('pbo_quantity_group');
+    const ig2Group = document.getElementById('ig2_quantity_group');
+    
+    // Show/hide quantity fields container
+    if (pboChecked || ig2Checked) {
+        quantityFields.style.display = 'block';
+    } else {
+        quantityFields.style.display = 'none';
+    }
+    
+    // Show/hide individual quantity fields
+    if (pboChecked) {
+        pboGroup.style.display = 'block';
+    } else {
+        pboGroup.style.display = 'none';
+        document.getElementById('itn_qty_pbo').value = 0;
+    }
+    
+    if (ig2Checked) {
+        ig2Group.style.display = 'block';
+    } else {
+        ig2Group.style.display = 'none';
+        document.getElementById('itn_qty_ig2').value = 0;
+    }
+    
+    validateITNQuantities();
+}
+
+function validateITNQuantities() {
+    const totalReceived = parseInt(document.getElementById('itns_received').value) || 0;
+    const pboChecked = document.getElementById('itn_type_pbo').checked;
+    const ig2Checked = document.getElementById('itn_type_ig2').checked;
+    const pboQty = parseInt(document.getElementById('itn_qty_pbo').value) || 0;
+    const ig2Qty = parseInt(document.getElementById('itn_qty_ig2').value) || 0;
+    
+    const totalFromTypes = pboQty + ig2Qty;
+    
+    // Update display
+    document.getElementById('itn_type_total').textContent = totalFromTypes;
+    
+    const statusEl = document.getElementById('itn_qty_status');
+    const errorEl = document.getElementById('error_itn_qty_mismatch');
+    
+    if (!pboChecked && !ig2Checked) {
+        statusEl.textContent = '';
+        statusEl.className = 'qty-status';
+        errorEl.style.display = 'none';
+        return true;
+    }
+    
+    if (totalFromTypes === totalReceived) {
+        statusEl.textContent = 'MATCHES';
+        statusEl.className = 'qty-status match';
+        errorEl.style.display = 'none';
+        return true;
+    } else {
+        statusEl.textContent = 'MISMATCH (Expected: ' + totalReceived + ')';
+        statusEl.className = 'qty-status mismatch';
+        errorEl.style.display = 'block';
+        return false;
+    }
+}
+
+function validateITNTypeSelection() {
+    const pboChecked = document.getElementById('itn_type_pbo').checked;
+    const ig2Checked = document.getElementById('itn_type_ig2').checked;
+    const errorEl = document.getElementById('error_itn_type');
+    
+    if (!pboChecked && !ig2Checked) {
+        errorEl.classList.add('show');
+        return false;
+    }
+    errorEl.classList.remove('show');
+    return true;
+}
+
+// ============================================
 // PHONE VALIDATION (9 digits only)
 // ============================================
 function setupPhoneValidation() {
@@ -373,6 +456,15 @@ function setupCalculations() {
     document.querySelectorAll('.enrollment-field, .itn-field').forEach(input => {
         input.addEventListener('input', calculateAll);
     });
+    
+    // Add listener for ITNs received to update remaining calculation
+    const itnsReceivedField = document.getElementById('itns_received');
+    if (itnsReceivedField) {
+        itnsReceivedField.addEventListener('input', function() {
+            calculateAll();
+            validateITNQuantities();
+        });
+    }
 }
 
 function calculateAll() {
@@ -417,6 +509,27 @@ function calculateAll() {
     setVal('total_girls_itn', totalGirlsITN);
     setVal('total_itn', totalITN);
 
+    // Calculate ITNs remaining (received - distributed)
+    const itnsReceived = getNum('itns_received');
+    const itnsRemaining = itnsReceived - totalITN;
+    setText('itns_remaining', itnsRemaining);
+    setVal('itns_remaining_val', itnsRemaining);
+    
+    // Update remaining status
+    const remainingStatus = document.getElementById('remaining_status');
+    if (remainingStatus) {
+        if (itnsRemaining < 0) {
+            remainingStatus.textContent = 'Warning: More ITNs distributed than received!';
+            remainingStatus.className = 'remaining-status warning';
+        } else if (itnsRemaining === 0 && itnsReceived > 0) {
+            remainingStatus.textContent = 'All ITNs distributed';
+            remainingStatus.className = 'remaining-status success';
+        } else {
+            remainingStatus.textContent = '';
+            remainingStatus.className = 'remaining-status';
+        }
+    }
+
     const propBoys = totalPupils > 0 ? Math.round((totalBoys / totalPupils) * 100) : 0;
     const propGirls = totalPupils > 0 ? Math.round((totalGirls / totalPupils) * 100) : 0;
     setText('prop_boys', propBoys + '%');
@@ -448,6 +561,71 @@ function calculateAll() {
     setText('tt_c', totalPupils > 0 ? Math.round((totalITN / totalPupils) * 100) + '%' : '0%');
 
     updateCharts();
+}
+
+// ============================================
+// ITN TYPE HANDLING
+// ============================================
+function toggleITNTypeQuantity() {
+    const pboChecked = document.getElementById('itn_type_pbo').checked;
+    const ig2Checked = document.getElementById('itn_type_ig2').checked;
+    
+    const quantityFields = document.getElementById('itn_quantity_fields');
+    const pboGroup = document.getElementById('pbo_quantity_group');
+    const ig2Group = document.getElementById('ig2_quantity_group');
+    
+    // Show/hide quantity section
+    if (pboChecked || ig2Checked) {
+        quantityFields.style.display = 'block';
+    } else {
+        quantityFields.style.display = 'none';
+    }
+    
+    // Show/hide individual quantity fields
+    pboGroup.style.display = pboChecked ? 'block' : 'none';
+    ig2Group.style.display = ig2Checked ? 'block' : 'none';
+    
+    // Reset hidden quantities to 0
+    if (!pboChecked) document.getElementById('itn_qty_pbo').value = 0;
+    if (!ig2Checked) document.getElementById('itn_qty_ig2').value = 0;
+    
+    validateITNQuantities();
+}
+
+function validateITNQuantities() {
+    const itnsReceived = getNum('itns_received');
+    const pboQty = getNum('itn_qty_pbo');
+    const ig2Qty = getNum('itn_qty_ig2');
+    const totalFromTypes = pboQty + ig2Qty;
+    
+    // Update total display
+    const totalDisplay = document.getElementById('itn_type_total');
+    const statusDisplay = document.getElementById('itn_qty_status');
+    const mismatchError = document.getElementById('error_itn_qty_mismatch');
+    
+    if (totalDisplay) totalDisplay.textContent = totalFromTypes;
+    
+    const pboChecked = document.getElementById('itn_type_pbo').checked;
+    const ig2Checked = document.getElementById('itn_type_ig2').checked;
+    
+    if ((pboChecked || ig2Checked) && itnsReceived > 0) {
+        if (totalFromTypes === itnsReceived) {
+            statusDisplay.textContent = '✓ Matches total received';
+            statusDisplay.className = 'qty-status match';
+            mismatchError.style.display = 'none';
+            return true;
+        } else {
+            statusDisplay.textContent = '✗ Does not match (' + itnsReceived + ' received)';
+            statusDisplay.className = 'qty-status mismatch';
+            mismatchError.style.display = 'block';
+            return false;
+        }
+    } else {
+        statusDisplay.textContent = '';
+        statusDisplay.className = 'qty-status';
+        mismatchError.style.display = 'none';
+        return true;
+    }
 }
 
 function getNum(id) {
@@ -672,6 +850,18 @@ function validateCurrentSection() {
 
     // Validate ITN fields in section 3
     if (state.currentSection === 3) {
+        // Validate ITN type selection
+        if (!validateITNTypeSelection()) {
+            valid = false;
+            showNotification('Please select at least one ITN type.', 'error');
+        }
+        
+        // Validate ITN type quantities match total received
+        if (!validateITNQuantities()) {
+            valid = false;
+            showNotification('ITN type quantities must equal total ITNs received.', 'error');
+        }
+        
         if (!validateAllITNFields()) {
             valid = false;
             showNotification('ITNs distributed cannot exceed enrollment. Please correct the errors.', 'error');
@@ -716,10 +906,47 @@ function updateProgress() {
 function showDraftNameModal() {
     const modal = document.getElementById('draftNameModal');
     const input = document.getElementById('draftNameInput');
-    const schoolName = document.getElementById('school_name').value || 'Unnamed School';
-    input.value = schoolName;
+    
+    // Auto-generate draft name from cascading fields
+    const draftName = generateDraftName();
+    input.value = draftName;
+    input.readOnly = true; // Make readonly - auto-generated
+    
     modal.classList.add('show');
-    input.focus();
+}
+
+function generateDraftName() {
+    const district = document.getElementById('district');
+    const chiefdom = document.getElementById('chiefdom');
+    const section = document.getElementById('section_loc');
+    const community = document.getElementById('community');
+    const school = document.getElementById('school_name');
+    
+    const parts = [];
+    
+    if (district && district.value) {
+        // Get short district name (remove "District" suffix)
+        let distName = district.value.replace(' District', '').trim();
+        parts.push(distName);
+    }
+    if (chiefdom && chiefdom.value) {
+        parts.push(chiefdom.value);
+    }
+    if (section && section.value) {
+        parts.push(section.value);
+    }
+    if (community && community.value) {
+        parts.push(community.value);
+    }
+    if (school && school.value) {
+        parts.push(school.value);
+    }
+    
+    if (parts.length === 0) {
+        return 'Draft - ' + new Date().toLocaleDateString();
+    }
+    
+    return parts.join('-');
 }
 
 function cancelDraftName() {
@@ -736,6 +963,10 @@ function saveDraft(name) {
     const formData = new FormData(document.getElementById('dataForm'));
     const data = { draftId: state.currentDraftId || 'draft_' + Date.now(), draftName: name, savedAt: new Date().toISOString(), currentSection: state.currentSection };
     for (const [k, v] of formData.entries()) data[k] = v;
+    
+    // Explicitly save checkbox states (FormData doesn't include unchecked checkboxes)
+    data.itn_type_pbo = document.getElementById('itn_type_pbo').checked;
+    data.itn_type_ig2 = document.getElementById('itn_type_ig2').checked;
 
     const idx = state.drafts.findIndex(d => d.draftId === data.draftId);
     if (idx >= 0) state.drafts[idx] = data;
@@ -813,10 +1044,20 @@ function loadDraft(id) {
                         
                         // Load all other fields
                         Object.keys(draft).forEach(k => {
-                            if (['draftId', 'draftName', 'savedAt', 'currentSection', 'district', 'chiefdom', 'section_loc', 'facility', 'community', 'school_name'].includes(k)) return;
+                            if (['draftId', 'draftName', 'savedAt', 'currentSection', 'district', 'chiefdom', 'section_loc', 'facility', 'community', 'school_name', 'itn_type_pbo', 'itn_type_ig2'].includes(k)) return;
                             const el = document.getElementById(k);
                             if (el) el.value = draft[k];
                         });
+                        
+                        // Restore ITN type checkboxes
+                        if (draft.itn_type_pbo !== undefined) {
+                            document.getElementById('itn_type_pbo').checked = draft.itn_type_pbo;
+                        }
+                        if (draft.itn_type_ig2 !== undefined) {
+                            document.getElementById('itn_type_ig2').checked = draft.itn_type_ig2;
+                        }
+                        // Trigger toggle to show/hide quantity fields
+                        toggleITNTypeQuantity();
 
                         if (draft.currentSection) {
                             document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
@@ -860,6 +1101,28 @@ function finalizeForm() {
     // Validate all phone fields
     if (!validateAllPhoneFields()) {
         showNotification('Please enter valid 9-digit phone numbers.', 'error');
+        return;
+    }
+
+    // Validate ITN type selection
+    const pboChecked = document.getElementById('itn_type_pbo').checked;
+    const ig2Checked = document.getElementById('itn_type_ig2').checked;
+    if (!pboChecked && !ig2Checked) {
+        showNotification('Please select at least one ITN type (PBO or IG2).', 'error');
+        state.currentSection = 3;
+        document.querySelectorAll('.form-section').forEach(sec => sec.classList.remove('active'));
+        document.querySelector('.form-section[data-section="3"]').classList.add('active');
+        updateProgress();
+        return;
+    }
+
+    // Validate ITN quantities match total received
+    if (!validateITNQuantities()) {
+        showNotification('ITN type quantities must equal total ITNs received.', 'error');
+        state.currentSection = 3;
+        document.querySelectorAll('.form-section').forEach(sec => sec.classList.remove('active'));
+        document.querySelector('.form-section[data-section="3"]').classList.add('active');
+        updateProgress();
         return;
     }
 
