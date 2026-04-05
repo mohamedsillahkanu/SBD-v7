@@ -316,14 +316,11 @@
     }
 
     function mergeData(sheetRows){
-        const local=getLocalRows();
-        // Deduplicate by school+date+submitted_by key
-        const seen=new Set();
-        const all=[...sheetRows,...local];
-        return all.filter(r=>{
-            const k=((r.school_name||'')+(r.distribution_date||'')+(r.submitted_by||'')).toLowerCase();
-            if(seen.has(k))return false;seen.add(k);return true;
-        });
+        // If we have fresh sheet data, use it as the source of truth.
+        // Only fall back to local data when sheet is unavailable.
+        if(sheetRows && sheetRows.length > 0) return sheetRows;
+        // Sheet unavailable — use local pending/submitted data
+        return getLocalRows();
     }
 
     // ════════════════════════════════════════════════════════
@@ -669,9 +666,8 @@
     // ════════════════════════════════════════════════════════
     //  TARGETS TAB — District → Chiefdom → Schools breakdown
     // ════════════════════════════════════════════════════════
+    // Build targets tree — each entry in ALL_LOCATION_DATA arrays is already unique
     function buildTargetsTree() {
-        // Returns tree: { district: { chiefdoms: { chiefdom: { schools: [{phu,community,name},...] } } } }
-        // Key = district|chiefdom|phu|community|school — full 5-part unique key
         const data = window.ALL_LOCATION_DATA || {};
         const tree = {};
 
@@ -680,7 +676,7 @@
             const dk = district.trim().toLowerCase();
             for (const chiefdom in data[district]) {
                 if (!tree[district].chiefdoms[chiefdom])
-                    tree[district].chiefdoms[chiefdom] = { schoolSet: new Set(), schools: [] };
+                    tree[district].chiefdoms[chiefdom] = { schools: [] };
                 const ck = chiefdom.trim().toLowerCase();
                 for (const phu in data[district][chiefdom]) {
                     const pk = phu.trim().toLowerCase();
@@ -690,16 +686,14 @@
                         if (!Array.isArray(schoolList)) continue;
                         schoolList.forEach(s => {
                             if (!s) return;
-                            const fullKey = dk+'|'+ck+'|'+pk+'|'+comk+'|'+s.trim().toLowerCase();
-                            const entry = tree[district].chiefdoms[chiefdom];
-                            if (!entry.schoolSet.has(fullKey)) {
-                                entry.schoolSet.add(fullKey);
-                                entry.schools.push({ district, chiefdom, phu, community, name: s, key: fullKey });
-                            }
+                            tree[district].chiefdoms[chiefdom].schools.push({
+                                district, chiefdom, phu, community, name: s,
+                                key: dk+'|'+ck+'|'+pk+'|'+comk+'|'+s.trim().toLowerCase()
+                            });
                         });
                     }
                 }
-                tree[district].chiefdoms[chiefdom].schools.sort((a, b) => a.name.localeCompare(b.name));
+                tree[district].chiefdoms[chiefdom].schools.sort((a,b) => a.name.localeCompare(b.name));
             }
         }
         return tree;
