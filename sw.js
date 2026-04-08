@@ -1,7 +1,7 @@
 // ============================================================
 //  SBD 2026 — ITN Distribution Survey · Service Worker
 //  BUMP THIS VERSION STRING every time you upload new files:
-const CACHE_VERSION = 'sbd-2026-v7';
+const CACHE_VERSION = 'sbd-2026-v9';
 // ============================================================
 
 // ── YOUR MAIN APP FILES ───────────────────────────────────────
@@ -16,12 +16,14 @@ const APP_FILES = [
   // Add ALL csv files used by any HTML in your repo here
   './cascading_data.csv',        // main app — school locations
   './itn_movement_users.csv',     // itn_movement.html — users/staff
+  './users_phu.csv',              // itn_received.html — PHU users
 ];
 
 // ── MODULE HTML FILES + THEIR OWN ASSETS ────────────────────
 // Each module HTML is cached so it works offline.
 // If a module uses its own CSV/JS files, add them here too.
 const MODULE_FILES = [
+  './assessment.html',
   './itn_movement.html',
   './itn_received.html',
   './monitoring.html',
@@ -37,6 +39,8 @@ const CDN_FILES = [
   'https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js',
   'https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js',
   'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js',
+  'https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js',
 ];
 
 // ── OPTIONAL (cached if they exist, silently skipped if not) ──
@@ -47,7 +51,6 @@ const OPTIONAL_FILES = [
   './logo_nmcp.png',
   './logo_pmi.png',
   './favicon.svg',
-  './video.mp4',
 ];
 
 // ── NEVER CACHE — always go to live network ───────────────────
@@ -62,6 +65,7 @@ const CACHE_EXTERNAL = [
   'fonts.googleapis.com',
   'fonts.gstatic.com',
   'cdn.jsdelivr.net',
+  'cdnjs.cloudflare.com',
 ];
 
 // ─────────────────────────────────────────────────────────────
@@ -130,8 +134,10 @@ self.addEventListener('fetch', event => {
         // Serve from cache instantly + refresh in background
         fetch(event.request)
           .then(r => {
-            if (r && r.status === 200)
-              caches.open(CACHE_VERSION).then(c => c.put(event.request, r));
+            if (r && r.status === 200) {
+              const rc = r.clone();
+              caches.open(CACHE_VERSION).then(c => c.put(event.request, rc));
+            }
           })
           .catch(() => {});
         return cached;
