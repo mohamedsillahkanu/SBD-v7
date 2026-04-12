@@ -1,7 +1,7 @@
 // ============================================================
 //  SBD 2026 — ITN Distribution Survey · Service Worker
 //  BUMP THIS VERSION STRING every time you upload new files:
-const CACHE_VERSION = 'sbd-2026-v11';
+const CACHE_VERSION = 'sbd-2026-v13';
 // ============================================================
 
 // ── YOUR MAIN APP FILES ───────────────────────────────────────
@@ -28,6 +28,8 @@ const MODULE_FILES = [
   './itn_received.html',
   './monitoring.html',
   './itn_reconciliation.html',
+  './id_cards.html',
+  './device_tag.html',
   './device_tracking.html',
 
 ];
@@ -40,18 +42,30 @@ const CDN_FILES = [
   'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js',
   'https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js',
+  // ── Remote images used as fallbacks ──────────────────────
+  'https://github.com/mohamedsillahkanu/gdp-dashboard-2/raw/6c7463b0d5c3be150aafae695a4bcbbd8aeb1499/ICF-SL.jpg',
 ];
 
 // ── OPTIONAL (cached if they exist, silently skipped if not) ──
 const OPTIONAL_FILES = [
-  './ICF-SL.jpg',
+  // ── Module HTML ───────────────────────────────────────────
   './attendance_payment.html',
   './distribution_report.html',
+  // ── Images & logos ────────────────────────────────────────
+  './ICF-SL.jpg',
   './infographics.png',
   './logo_mohs.png',
   './logo_nmcp.png',
   './logo_pmi.png',
+  // ── Icons & PWA assets ────────────────────────────────────
   './favicon.svg',
+  './icon-192.svg',
+  './icon-maskable-512.png',
+  './icon-512.png',
+  './icon-192.png',
+  './apple-touch-icon.png',
+  // ── School QR generator tool ──────────────────────────────
+  './school_qr_generator.html',
 ];
 
 // ── NEVER CACHE — always go to live network ───────────────────
@@ -67,6 +81,8 @@ const CACHE_EXTERNAL = [
   'fonts.gstatic.com',
   'cdn.jsdelivr.net',
   'cdnjs.cloudflare.com',
+  'raw.githubusercontent.com',
+  'github.com',
 ];
 
 // ─────────────────────────────────────────────────────────────
