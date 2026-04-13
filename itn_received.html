@@ -203,7 +203,7 @@
         <div class="login-title">ICF‑SL · PHU RECEIPT</div>
         <div class="login-sub">PHU Staff Login</div>
         <div class="login-divider"></div>
-        <div id="loginLoading" style="color:var(--navy);text-align:center;font-size:0.82rem;margin-bottom:10px;">⏳ Loading data…</div>
+        <div id="loginLoading" style="display:none;"></div>
 
         <!-- ── QR Login ── -->
         <div class="login-section-label">👤 SCAN YOUR SBD QR ID CARD</div>
@@ -242,7 +242,7 @@
         </div>
 
         <div id="loginErr" style="color:var(--red);font-size:0.78rem;margin-top:4px;display:none;"></div>
-        <button class="btn btn-block" id="loginBtn" disabled>⏳ LOADING…</button>
+        
     </div>
 </div>
 
@@ -755,6 +755,65 @@ function normaliseDispatch(d) {
 }
 
 function prefillForm(data) {
+    // ── PHU/District mismatch check using cascade data ─────────
+    var dispatchDistrict = (data.district || '').trim();
+    var dispatchPHU      = (data.phu      || '').trim();
+    var userDistrict     = (currentUser && currentUser.district || '').trim();
+
+    function getOrShowErr(msg) {
+        showToast('⛔ ' + msg, 'error');
+        var errDiv = document.getElementById('phuMismatchErr');
+        if (!errDiv) {
+            errDiv = document.createElement('div');
+            errDiv.id = 'phuMismatchErr';
+            errDiv.style.cssText = 'background:#ffebee;border:3px solid #B03A2E;border-radius:12px;padding:16px 18px;margin-bottom:18px;';
+            document.getElementById('stepScan').insertAdjacentElement('afterbegin', errDiv);
+        }
+        errDiv.style.display = 'block';
+        errDiv.innerHTML = '<div style="display:flex;gap:12px;align-items:flex-start;">'
+            + '<span style="font-size:2rem;">⛔</span>'
+            + '<div><strong style="color:#B03A2E;font-size:1rem;">WRONG DELIVERY — DO NOT ACCEPT</strong>'
+            + '<p style="color:#555;font-size:0.82rem;margin-top:4px;">' + msg + '</p></div></div>';
+        scannedData = null;
+    }
+
+    // 1. District must match
+    if (dispatchDistrict && userDistrict &&
+        dispatchDistrict.toLowerCase() !== userDistrict.toLowerCase()) {
+        getOrShowErr(
+            'This dispatch is for <strong>' + dispatchDistrict + '</strong> district. ' +
+            'You are logged in from <strong>' + userDistrict + '</strong>. ' +
+            'Contact your supervisor.'
+        );
+        return;
+    }
+
+    // 2. PHU must exist in cascade data for this district
+    if (dispatchDistrict && dispatchPHU && Object.keys(locationData).length > 0) {
+        // Find district in locationData (case-insensitive)
+        var distKey = Object.keys(locationData).find(function(k) {
+            return k.toLowerCase() === dispatchDistrict.toLowerCase();
+        });
+        if (distKey) {
+            // Flatten all PHUs for this district
+            var allPHUs = [];
+            Object.values(locationData[distKey]).forEach(function(arr) {
+                arr.forEach(function(p) { allPHUs.push(p.toLowerCase()); });
+            });
+            if (allPHUs.indexOf(dispatchPHU.toLowerCase()) === -1) {
+                getOrShowErr(
+                    '<strong>' + dispatchPHU + '</strong> is not a known PHU in <strong>' + dispatchDistrict + '</strong>. ' +
+                    'This QR may be for a different district or may be invalid. Do not accept this delivery.'
+                );
+                return;
+            }
+        }
+    }
+
+    // Hide mismatch error if previously shown
+    var errDiv = document.getElementById('phuMismatchErr');
+    if (errDiv) errDiv.style.display = 'none';
+
     document.getElementById('fDispId').value   = data.dispatchId || '';
     document.getElementById('fDate').value     = (data.date||'') + (data.time?' '+data.time:'');
     document.getElementById('fDistrict').value = data.district   || currentUser?.district || '';
