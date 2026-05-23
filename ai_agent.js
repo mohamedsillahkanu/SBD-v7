@@ -912,21 +912,10 @@
                 <div class="tg-kl">Non-EMIS Schools Reached (Additional schools not in target)</div>
                 <div style="font-size:10px;margin-top:4px;">${newSubmitted} Non-EMIS Schools reached · ${newPct}%</div>
             </div>
-    
-            <div class="tg-kpi ${natPct>=80?'g':natPct>=50?'o':'r'}">
-                <div class="tg-kv">${natPct}%</div>
-                <div class="tg-kl">Progress</div>
-            </div>
         </div>
     
         <div style="margin-bottom:20px;">
-            <div style="display:flex;justify-content:space-between;font-family:'Oswald',sans-serif;font-size:11px;color:#607080;margin-bottom:5px;">
-                <span>${filterLabel} — PROGRESS</span>
-                <span style="font-weight:700;color:${natPct>=80?'#28a745':natPct>=50?'#b8860b':'#dc3545'}">${natSubmitted} / ${natTotal} schools (${natPct}%)</span>
-            </div>
-            <div class="tg-nat-bar">
-                <div class="tg-nat-fill" style="width:${natPct}%;background:${natPct>=80?'#28a745':natPct>=50?'#f0a500':'#dc3545'};"></div>
-            </div>
+           
         </div>`;
     
         // Build district sections
